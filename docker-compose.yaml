@@ -1,13 +1,19 @@
-services: 
-  postgres: 
+services:
+  postgres:
     container_name: ex-backend-pg
-    image: postgres
-    ports: 
-      - 5432:5432
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
     environment:
-      - POSTGRES_USER: postgres
-      - POSTGRES_PASSWORD: docker
-      - POSTGRES_DB: ex-backend
-      - PGDATA: /data/postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: docker
+      POSTGRES_DB: ex-backend
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
-      - ./data/pg:/data/postgres
+      - ./data/pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d ex-backend"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
