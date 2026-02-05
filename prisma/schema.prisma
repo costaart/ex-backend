@@ -1,14 +1,99 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  ADMIN
+  USUARIO
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      UserRole @default(USUARIO)
+
+  orders    Order[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
+
+model Client {
+  id          String   @id @default(uuid())
+  razaoSocial String
+  cnpj        String   @unique
+  email       String
+
+  orders      Order[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("clients")
+}
+
+model Product {
+  id          String         @id @default(uuid())
+  descricao   String
+  valorVenda  Decimal        
+  estoque     Int
+
+  images      ProductImage[]
+  items       OrderItem[]
+
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@map("products")
+}
+
+model ProductImage {
+  id        String   @id @default(uuid())
+  productId String
+  url       String
+
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("product_images")
+}
+
+model Order {
+  id        String      @id @default(uuid())
+  clientId  String
+  userId    String
+
+  client    Client      @relation(fields: [clientId], references: [id])
+  user      User        @relation(fields: [userId], references: [id])
+
+  items     OrderItem[]
+
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String   @id @default(uuid())
+  orderId    String
+  productId  String
+  quantity   Int
+  unitPrice  Decimal  
+
+  order      Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product    Product  @relation(fields: [productId], references: [id])
+
+  @@unique([orderId, productId])
+  @@map("order_items")
 }
