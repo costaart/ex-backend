@@ -12,6 +12,8 @@ export class GetProductByIdService {
       throw new NotFoundException('Product not found');
     }
 
-    return product;
+    return {
+      product,
+    };
   }
 }

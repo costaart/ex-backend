@@ -6,9 +6,9 @@ export class DeleteProductService {
   constructor(private productsRepository: ProductsRepository) {}
 
   async handle(id: string) {
-    const exists = await this.productsRepository.findById(id);
+    const productExists = await this.productsRepository.findById(id);
 
-    if (!exists) {
+    if (!productExists) {
       throw new NotFoundException('Product not found');
     }
 
