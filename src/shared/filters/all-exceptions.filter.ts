@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { Prisma } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 @Catch() // <- pega qlqr erro
 export class AllExceptionsFilter implements ExceptionFilter {
@@ -29,7 +29,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     }
 
     //erro do prisma
-    if (exception instanceof Prisma.PrismaClientKnownRequestError) {
+    if (exception instanceof PrismaClientKnownRequestError) {
       const { status, message } = this.handlePrismaError(exception);
 
       return response.status(status).json({
@@ -51,7 +51,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
     });
   }
 
-  private handlePrismaError(error: Prisma.PrismaClientKnownRequestError): {
+  private handlePrismaError(error: PrismaClientKnownRequestError): {
     status: number;
     message: string;
   } {
