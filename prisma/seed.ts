@@ -4,7 +4,8 @@ import { hash } from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  const passwordHash = await hash('admin123', 10);
+  const adminPassword = await hash('123456', 10);
+  const userPassword = await hash('123456', 10);
 
   await prisma.user.upsert({
     where: { email: 'admin@admin.com' },
@@ -12,10 +13,27 @@ async function main() {
     create: {
       name: 'Admin',
       email: 'admin@admin.com',
-      password: passwordHash,
+      password: adminPassword,
       role: UserRole.ADMIN,
+    },
+  });
+
+  await prisma.user.upsert({
+    where: { email: 'user@user.com' },
+    update: {},
+    create: {
+      name: 'Usuario',
+      email: 'user@user.com',
+      password: userPassword,
+      role: UserRole.USUARIO,
     },
   });
 }
 
-main().finally(async () => prisma.$disconnect());
+main()
+  .then(() => {
+    console.log('Seed executed successfully');
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
