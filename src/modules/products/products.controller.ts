@@ -125,7 +125,6 @@ export class ProductsController {
     return this.getProductById.handle(id);
   }
 
-  // admin
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('ADMIN')
   @Post()

@@ -36,7 +36,6 @@ import { DeleteClientService } from './services/delete-client.service';
 @ApiBearerAuth()
 @Controller({ path: 'clients', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('ADMIN')
 export class ClientsController {
   constructor(
     private createClient: CreateClientService,
@@ -47,6 +46,7 @@ export class ClientsController {
   ) {}
 
   @Get()
+  @Roles('ADMIN', 'USUARIO')
   @ApiQuery({
     name: 'page',
     required: false,
@@ -104,17 +104,20 @@ export class ClientsController {
   }
 
   @Get(':id')
+  @Roles('ADMIN', 'USUARIO')
   @ApiParam({ name: 'id', type: String, example: 'uuid-do-cliente' })
   getById(@Param('id') id: string) {
     return this.getClientById.handle(id);
   }
 
   @Post()
+  @Roles('ADMIN')
   create(@Body() dto: CreateClientDto) {
     return this.createClient.handle(dto);
   }
 
   @Patch(':id')
+  @Roles('ADMIN')
   @ApiParam({ name: 'id', type: String, example: 'uuid-do-cliente' })
   @ApiBody({
     description: 'Campos para atualização (todos opcionais)',
@@ -132,6 +135,7 @@ export class ClientsController {
   }
 
   @Delete(':id')
+  @Roles('ADMIN')
   @ApiParam({ name: 'id', type: String, example: 'uuid-do-cliente' })
   async remove(@Param('id') id: string) {
     await this.deleteClient.handle(id);
