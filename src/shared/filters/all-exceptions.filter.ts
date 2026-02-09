@@ -8,7 +8,7 @@ import {
 import { Request, Response } from 'express';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
-@Catch() // <- pega qlqr erro
+@Catch()
 export class AllExceptionsFilter implements ExceptionFilter {
   catch(exception: unknown, host: ArgumentsHost) {
     const context = host.switchToHttp();

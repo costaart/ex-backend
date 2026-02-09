@@ -118,12 +118,12 @@ export class OrdersRepository {
   async createOrderWithItems(params: CreateOrderParams) {
     const { clientId, userId, items } = params;
 
-    return this.prisma.$transaction(async (tx) => {
-      const order = await tx.order.create({
+    return this.prisma.$transaction(async (transaction) => {
+      const order = await transaction.order.create({
         data: { clientId, userId },
       });
 
-      await tx.orderItem.createMany({
+      await transaction.orderItem.createMany({
         data: items.map((i) => ({
           orderId: order.id,
           productId: i.productId,
@@ -133,13 +133,13 @@ export class OrdersRepository {
       });
 
       for (const i of items) {
-        await tx.product.update({
+        await transaction.product.update({
           where: { id: i.productId },
           data: { estoque: { decrement: i.quantity } },
         });
       }
 
-      return tx.order.findUnique({
+      return transaction.order.findUnique({
         where: { id: order.id },
         include: {
           client: true,
